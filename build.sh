@@ -91,13 +91,13 @@ main() {
 	echo "[=] 请按音量键选择修补是否带网络解冻的版本"
 	echo "[?] 如果你不知道你使用的墓碑是否拥有网络解冻功能，请阅读你使用的墓碑文档"
 	echo "[+] 音量 +，ReKernel (无网络解冻)"
-	echo "[-] 音量 -，ReKernel_network (有网络解冻)"
+	echo "[-] 音量 -，ReKernel_network (带网络解冻)"
 	key_event=$(key_check)
 	if [ "$key_event" == "KEY_VOLUMEUP" ]; then
-		echo "你按了音量上键，开始修补 Re-kernel(network)"
+		echo "你按了音量上键，开始修补 Re-kernel"
 		kpm="Re-Kernel"
 	elif [ "$key_event" == "KEY_VOLUMEDOWN" ]; then
-		echo "你按了音量下键，开始修补 Re-kernel"
+		echo "你按了音量下键，开始修补 Re-kernel(network)"
 		kpm="Re-Kernel_network"
 	else
 		echo "未检测到你按的音量键，脚本退出"
