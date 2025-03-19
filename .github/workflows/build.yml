@@ -11,9 +11,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: clone repo
-        run: |
-          [ -d "ReKPatch" ] && rm -rf ReKPatch
-          git clone https://github.com/Prslc/ReKPatch.git --branch=test
+        run: git clone https://github.com/Prslc/ReKPatch.git
 
       - name: Download required files
         env:
