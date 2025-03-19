@@ -1,0 +1,48 @@
+name: Build Magiskboot
+
+on:
+  workflow_dispatch:  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 安装 Android NDK 和构建工具
+      - name: Set up Android NDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/android/repository/android-ndk-r23b-linux-x86_64.zip
+          unzip android-ndk-r23b-linux-x86_64.zip -d $HOME
+          export ANDROID_NDK_HOME=$HOME/android-ndk-r23b
+          export PATH=$ANDROID_NDK_HOME:$PATH
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
+          echo "PATH=$PATH" >> $GITHUB_ENV
+
+      # 克隆 Magisk 仓库并编译 magiskboot
+      - name: Clone Magisk repository
+        run: |
+          git clone https://github.com/topjohnwu/Magisk.git
+          cd Magisk
+          git submodule update --init --recursive
+          
+      - name: Build magiskboot
+        run: |
+          cd Magisk
+          # 确保依赖项已经安装（如 Android NDK 等）
+          make magiskboot
+
+      # 创建并压缩编译产物
+      - name: Create archive
+        run: |
+          zip -r magiskboot.zip Magisk/magiskboot
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: magiskboot
+          path: magiskboot.zip
