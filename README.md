@@ -34,7 +34,7 @@
 
 ## ❤️ 感谢以下项目
 
--  [Magisk/magiskboot](https://github.com/topjohnwu/Magisk)
+-  [Magisk](https://github.com/topjohnwu/Magisk)
 -  [KernelPatch](https://github.com/bmax121/KernelPatch)
 -  [Re-Kernel](https://github.com/Sakion-Team/Re-Kernel)
 -  [Apatch](https://github.com/bmax121/APatch)
