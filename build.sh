@@ -5,36 +5,6 @@ MODDIR="${0%/*}"
 # 自定义密钥
 key="aqmJau7K"
 
-# 完整性检验文件
-REQUIRED_ITEMS="
-README.md
-build.sh
-clean.sh
-kpm/kpimg-android
-kpm/kptools-android
-kpm/re_kernel_6.0.11.kpm
-magiskboot
-"
-
-# 检查完整性
-MISSING_ITEMS=""
-for item in $REQUIRED_ITEMS; do
-	if [ ! -e "$MODDIR/$item" ]; then
-		MISSING_ITEMS="$MISSING_ITEMS\n[x] 缺失: $item"
-	fi
-done
-
-# 输出完整性校验结果
-if [ -n "$MISSING_ITEMS" ]; then
-	printf "[!] 检查失败，以下文件/目录缺失：%b\n" "$MISSING_ITEMS"
-	echo "[!] 完整性校验失败，请确认文件是否损坏"
-	echo "[!] 如果下载文件出现了损坏，请重新下载"
-	echo "[x] 脚本已退出"
-	exit 1
-else
-	echo "[✓] 完整性校验已通过，继续执行..."
-fi
-
 # 检查 boot 是否存在
 if [ ! -f "boot.img" ]; then
 	echo "[!] 当前目录下未找到 boot.img"
