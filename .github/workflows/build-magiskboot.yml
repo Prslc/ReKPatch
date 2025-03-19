@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
       # 安装 Android NDK 和构建工具
       - name: Set up Android NDK
