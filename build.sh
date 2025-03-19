@@ -65,9 +65,9 @@ Kernel_patching() {
 	is_rekernel=$(./kptools-android -l -i patched_kernel)
 	[ -e "patched_kernel" ] && echo "[✓] Kernel 修补已完成"
 	if echo "$is_rekernel" | grep -qE "re_kernel"; then
-		echo "[✓] ReKernel 已成功修补进你的内核！"
+		echo "[✓] $kpm 已成功修补进你的内核！"
 	else
-		echo "[x] ReKernel 修补失败，脚本已退出"
+		echo "[x] $kpm 修补失败，脚本已退出"
 		cd ..
 		sh clean.sh
 		echo "[x] 已清理修补产生的文件，尝试重新修补"
@@ -91,7 +91,7 @@ main() {
 	echo "[=] 请按音量键选择修补是否带网络解冻的版本"
 	echo "[?] 如果你不知道你使用的墓碑是否拥有网络解冻功能，请阅读你使用的墓碑文档"
 	echo "[+] 音量 +，ReKernel (不带网络解冻)"
-	echo "[-] 音量 +，ReKernel_network (带网络解冻)"
+	echo "[-] 音量 -，ReKernel_network (带网络解冻)"
 	key_event=$(key_check)
 	if [ "$key_event" == "KEY_VOLUMEUP" ]; then
 		ui_print "你按了音量上键，开始修补 Re-kernel(network)"
