@@ -61,7 +61,7 @@ boot_unpack() {
 # 修补 Kernel
 Kernel_patching() {
 	echo "[-] 正在对 kernel 执行修补"
-	./kptools-android -p -i kernel -k kpimg-android -M re_kernel_6.0.11.kpm -V pre-kernel-init -T kpm -s $key -o patched_kernel
+	./kptools-android -p -i kernel -k kpimg-android -M $1.kpm -V pre-kernel-init -T kpm -s $key -o patched_kernel
 	is_rekernel=$(./kptools-android -l -i patched_kernel)
 	[ -e "patched_kernel" ] && echo "[✓] Kernel 修补已完成"
 	if echo "$is_rekernel" | grep -qE "re_kernel"; then
@@ -88,8 +88,25 @@ boot_repack() {
 
 main() {
 	Basic_Check
+	key_event=$(key_check)
+	echo "[=] 请按音量键选择修补是否带网络解冻的版本"
+	echo "[?] 如果你不知道你使用的墓碑是否拥有网络解冻功能，请阅读你使用的墓碑文档"
+	echo "[+] 音量 +，ReKernel (不带网络解冻)"
+	echo "[-] 音量 +，ReKernel_network (带网络解冻)"
+	if [ "$key_event" == "KEY_VOLUMEUP" ]; then
+		ui_print "你按了音量上键，开始修补 Re-kernel(network)"
+		kpm="Re-Kernel"
+	elif [ "$key_event" == "KEY_VOLUMEDOWN" ]; then
+		ui_print "你按了音量下键，开始修补 Re-kernel"
+		kpm="Re-Kernel_network"
+	else
+		echo "未检测到你按的音量键，脚本退出"
+		echo "如果你认为这是一个问题请提交 issue"
+		echo "key_event = $key_event"
+		exit 1
+	fi
 	boot_unpack
-	Kernel_patching
+	Kernel_patching $kpm
 	boot_repack
 	exit 0
 }
