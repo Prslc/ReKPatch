@@ -27,6 +27,28 @@ Basic_Check() {
 	fi
 }
 
+# 音量键检测
+key_check() {
+	while true; do
+		key_check=$(/system/bin/getevent -qlc 1)
+		key_event=$(echo "$key_check" | awk '{ print $3 }' | grep 'KEY_')
+		key_status=$(echo "$key_check" | awk '{ print $4 }')
+		if [[ "$key_event" == *"KEY_"* && "$key_status" == "DOWN" ]]; then
+			keycheck="$key_event"
+			break
+		fi
+	done
+	while true; do
+		key_check=$(/system/bin/getevent -qlc 1)
+		key_event=$(echo "$key_check" | awk '{ print $3 }' | grep 'KEY_')
+		key_status=$(echo "$key_check" | awk '{ print $4 }')
+		if [[ "$key_event" == *"KEY_"* && "$key_status" == "UP" ]]; then
+			break
+		fi
+	done
+	echo "$keycheck"
+}
+
 # 解包 boot
 boot_unpack() {
 	echo "[-] 正在解包 boot 获取 kernel"
