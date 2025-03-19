@@ -32,9 +32,10 @@ jobs:
         run: |
           mkdir -p ReKPatch/kpm
           cp kpimg-android kptools-android Re-Kernel.kpm Re-Kernel_network.kpm ReKPatch/kpm
+          rm ReKPatch/.git ReKPatch/.github
 
       - name: Upload zip
         uses: actions/upload-artifact@v4
         with:
-          name: ReKPatch.zip
+          name: ReKPatch
           path: ReKPatch
