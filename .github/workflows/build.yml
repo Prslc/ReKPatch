@@ -18,7 +18,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           KernelPatch_LATEST_TAG=$(gh release list -R bmax121/KernelPatch --limit 1 | awk '{print $1}')
-          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-android"
+          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-linux"
           gh release download "$KernelPatch_LATEST_TAG" -R bmax121/kernelPatch --pattern "kptools-android"
 
           KPM_LATEST_TAG=$(gh release list -R lzghzr/APatch_kpm  --limit 1 | awk '{print $1}')
@@ -29,7 +29,7 @@ jobs:
       - name: Repack ReKPatch
         run: |
           mkdir -p ReKPatch/kpm
-          cp kpimg-android kptools-android Re-Kernel.kpm Re-Kernel_network.kpm ReKPatch/kpm
+          cp kpimg-linux kptools-android Re-Kernel.kpm Re-Kernel_network.kpm ReKPatch/kpm
           rm -rf ReKPatch/.git ReKPatch/.github
           mkdir tmp
           mv ReKPatch tmp/
