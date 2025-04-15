@@ -61,7 +61,7 @@ boot_unpack() {
 # 修补 Kernel
 Kernel_patching() {
 	echo "[-] 正在对 kernel 执行修补"
-	./kptools-android -p -i kernel -k kpimg-android -M $1.kpm -V pre-kernel-init -T kpm -s $key -o patched_kernel
+	./kptools-android -p -i kernel -k kpimg-linux -M $1.kpm -V pre-kernel-init -T kpm -s $key -o patched_kernel
 	is_rekernel=$(./kptools-android -l -i patched_kernel)
 	[ -e "patched_kernel" ] && echo "[✓] Kernel 修补已完成"
 	if echo "$is_rekernel" | grep -qE "re_kernel"; then
