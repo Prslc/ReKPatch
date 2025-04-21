@@ -15,6 +15,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          mkdir kpm
           cd kpm
           KernelPatch_LATEST_TAG=$(gh release list -R bmax121/KernelPatch --limit 1 | awk '{print $1}')
           gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-linux"
