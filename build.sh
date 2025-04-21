@@ -24,6 +24,7 @@ Basic_Check() {
 		exit 1
 	else
 		echo "[✓] 当前处于拥有可执行权限目录下，继续执行..."
+		cp boot.img magiskboot/
 	fi
 }
 
@@ -52,9 +53,9 @@ key_check() {
 # 解包 boot
 boot_unpack() {
 	echo "[-] 正在解包 boot 获取 kernel"
-	./libmagiskboot.so unpack boot.img >/dev/null 2>&1
+	magiskboot/libmagiskboot.so unpack magiskboot/boot.img >/dev/null 2>&1
 	[ -e "kernel" ] && echo "[✓] 已成功获取 kernel"
-	cp kernel kpm/
+	cp magiskboot/kernel kpm/
 	cd kpm
 }
 
@@ -74,13 +75,13 @@ Kernel_patching() {
 		exit 1
 	fi
 
-	cp -f patched_kernel ../kernel
+	cp -f patched_kernel ../magiskboot/kernel
 	cd ..
 }
 
 boot_repack() {
 	echo "[-] 正在打包 boot"
-	./libmagiskboot.so repack boot.img >/dev/null 2>&1
+	magiskboot/libmagiskboot.so repack magiskboot/boot.img >/dev/null 2>&1
 	[ -e "new-boot.img" ] && echo "[✓] boot 已打包成功"
 	echo "[✓] 脚本已执行完毕，请确认当前目录下是否存在 new-boot.img"
 	echo "[✓] 最后刷入 new-boot.img，即可获得 Rekernel"
