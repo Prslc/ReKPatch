@@ -48,7 +48,7 @@ jobs:
       - name: Repack ReKPatch
         run: |
           mkdir ReKPatch
-          find . -maxdepth 1 ! -name "ReKPatch" -exec cp -r {} ReKPatch \;
+          find . -maxdepth 1 ! -name "ReKPatch" -exec mv {} ReKPatch \;
 
       - name: Upload zip
         uses: actions/upload-artifact@v4
