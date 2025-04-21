@@ -25,6 +25,13 @@ Basic_Check() {
 	else
 		echo "[✓] 当前处于拥有可执行权限目录下，继续执行..."
 	fi
+
+	if [[ -e "kernel" && -e "new-boot.img" ]]; then
+		echo "[?] 当前目录不干净，可能会影响嵌入效果"
+		echo "[-] 正在清理目录，以保证嵌入不会失败"
+		sh clean.sh
+		echo "[✓] 已清理完成，继续执行..."
+	fi
 }
 
 # 音量键检测
