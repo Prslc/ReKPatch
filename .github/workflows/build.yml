@@ -9,12 +9,13 @@ jobs:
 
     steps:
       - name: clone repo
-        run: git clone https://github.com/Prslc/ReKPatch.git
+        uses: actions/checkout@v4
 
       - name: Download required files
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          cd kpm
           KernelPatch_LATEST_TAG=$(gh release list -R bmax121/KernelPatch --limit 1 | awk '{print $1}')
           gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-linux"
           gh release download "$KernelPatch_LATEST_TAG" -R bmax121/kernelPatch --pattern "kptools-android"
@@ -24,14 +25,19 @@ jobs:
           mv re_kernel_*_network.kpm Re-Kernel_network.kpm
           find . -type f -name "re_kernel_*.kpm" -exec mv {} Re-Kernel.kpm \;
 
+          cd ../
+          MAGISK_LATEST_TAG=$(gh release list -R topjohnwu/Magisk  --limit 1 | awk '{print $1}')
+          gh release download "$MAGISK_LATEST_TAG" -R topjohnwu/Magisk --pattern "Magisk-*.apk"
+          mkdir magisk_unpack
+          unzip Magisk-*.apk -d magisk_unpack
+          cp magisk_unpack/lib/arm64-v8a/libmagiskboot.so .
+          rm -rf Magisk-*.apk magisk_unpack
+
+
       - name: Repack ReKPatch
         run: |
-          mkdir -p ReKPatch/kpm
-          cp kpimg-linux kptools-android Re-Kernel.kpm Re-Kernel_network.kpm ReKPatch/kpm
-          rm -rf ReKPatch/.git ReKPatch/.github
-          mkdir tmp
-          mv ReKPatch tmp/
-          mv tmp ReKPatch
+          mkdir ReKPatch
+          cp * ReKPatch
 
       - name: Upload zip
         uses: actions/upload-artifact@v4
