@@ -16,41 +16,42 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir kpm
-          cd kpm
-          
+          cd kpm 
+          echo "Fetching latest release for KernelPatch..."
           KernelPatch_LATEST_TAG=$(gh release list -R bmax121/KernelPatch --limit 1 | awk '{print $1}')
-          if [ -z "$KernelPatch_LATEST_TAG" ]; then
-            echo "Error: No release found for bmax121/KernelPatch"
-            exit 1
-          fi
-          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-linux" || exit 1
-          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/kernelPatch --pattern "kptools-android" || exit 1
+          echo "KernelPatch_LATEST_TAG: $KernelPatch_LATEST_TAG"
+          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-linux"
+          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/kernelPatch --pattern "kptools-android"
 
-          KPM_LATEST_TAG=$(gh release list -R lzghzr/APatch_kpm  --limit 1 | awk '{print $1}')
-          if [ -z "$KPM_LATEST_TAG" ]; then
-            echo "Error: No release found for lzghzr/APatch_kpm"
-            exit 1
-          fi
-          gh release download "$KPM_LATEST_TAG" -R lzghzr/APatch_kpm --pattern "re_kernel*.kpm" || exit 1
+          echo "Fetching latest release for APatch_kpm..."
+          KPM_LATEST_TAG=$(gh release list -R lzghzr/APatch_kpm --limit 1 | awk '{print $1}')
+          echo "KPM_LATEST_TAG: $KPM_LATEST_TAG"
+          gh release download "$KPM_LATEST_TAG" -R lzghzr/APatch_kpm --pattern "re_kernel*.kpm"
           mv re_kernel_*_network.kpm Re-Kernel_network.kpm
           find . -type f -name "re_kernel_*.kpm" -exec mv {} Re-Kernel.kpm \;
+          
+          cd ../
+          echo "Fetching latest release for Magisk..."
+          MAGISK_LATEST_TAG="v28.1"  # Adjusted to the correct version
+          echo "MAGISK_LATEST_TAG: $MAGISK_LATEST_TAG"
+          gh release download "$MAGISK_LATEST_TAG" -R topjohnwu/Magisk --pattern "Magisk-*.apk"
 
-          MAGISK_LATEST_TAG=$(gh release list -R topjohnwu/Magisk  --limit 1 | awk '{print $1}')
-          if [ -z "$MAGISK_LATEST_TAG" ]; then
-            echo "Error: No release found for topjohnwu/Magisk"
-            exit 1
-          fi
-          gh release download "$MAGISK_LATEST_TAG" -R topjohnwu/Magisk --pattern "Magisk-*.apk" || exit 1
+          echo "Unpacking Magisk APK..."
+          mkdir magisk_unpack
+          unzip Magisk-*.apk -d magisk_unpack
+          cp magisk_unpack/lib/arm64-v8a/libmagiskboot.so .
+          rm -rf Magisk-*.apk magisk_unpack
+
 
 
 
       - name: Repack ReKPatch
         run: |
           mkdir ReKPatch
-          cp * ReKPatch
+          find . -maxdepth 1 ! -name "ReKPatch" -exec cp -r {} ReKPatch \;
 
       - name: Upload zip
         uses: actions/upload-artifact@v4
         with:
           name: ReKPatch
-          path: ReKPatch
+          path: .
