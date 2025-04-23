@@ -6,11 +6,11 @@ MODDIR="${0%/*}"
 key="aqmJau7K"
 
 Basic_Check() {
-    # 检查是否是 root 用户
-    if [ "$(whoami)" != "root" ]; then
-        echo "请使用 Root 权限运行此脚本"
-    exit 1
-    fi
+       # 检查是否是 root 用户
+        if [ "$(whoami)" != "root" ]; then
+                echo "请使用 Root 权限运行此脚本"
+                exit 1
+       fi
     
 	# 检查 boot 是否存在
 	if [ ! -f "boot.img" ]; then
@@ -94,8 +94,9 @@ main() {
 		echo "你选择了 ReKernel_network (带网络解冻)"
 		echo "开始修补..."
 		kpm="Re-Kernel_network"
- elif [ "$UserChose" -eq 0 ]; then
-  echo "脚本已退出"
+        elif [ "$UserChose" -eq 0 ]; then
+                echo "脚本已退出"
+		exit 1
 	else
 		echo "错误的输入，脚本已退出"
 		exit 1
