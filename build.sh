@@ -6,11 +6,11 @@ MODDIR="${0%/*}"
 key="aqmJau7K"
 
 Basic_Check() {
-# 检查是否是 root 用户
-if [ "$(whoami)" != "root" ]; then
-    echo "请使用 Root 权限运行此脚本"
-    exit 1
-fi
+ # 检查是否是 root 用户
+ if [ "$(whoami)" != "root" ]; then
+  echo "请使用 Root 权限运行此脚本"
+  exit 1
+ fi
 
 	# 检查 boot 是否存在
 	if [ ! -f "boot.img" ]; then
