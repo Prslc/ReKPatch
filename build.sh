@@ -94,6 +94,8 @@ main() {
 		echo "你选择了 ReKernel_network (带网络解冻)"
 		echo "开始修补..."
 		kpm="Re-Kernel_network"
+ elif [ "$UserChose" -eq 0 ]; then
+  echo "脚本已退出"
 	else
 		echo "错误的输入，脚本已退出"
 		exit 1
