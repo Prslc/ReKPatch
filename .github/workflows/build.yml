@@ -32,9 +32,7 @@ jobs:
           
           cd ../
           echo "Fetching latest release for Magisk..."
-          Magisk_LATEST_TAG=$(gh release list -R topjohnwu/Magisk --limit 1 | awk '{print $1}')
-          echo "MAGISK_LATEST_TAG: $Magisk_LATEST_TAG"
-          gh release download "$MAGISK_LATEST_TAG" -R topjohnwu/Magisk --pattern "Magisk-*.apk"
+          gh release download -R topjohnwu/Magisk --pattern "Magisk-*.apk"
 
           echo "Unpacking Magisk APK..."
           mkdir magisk_unpack
