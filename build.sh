@@ -6,17 +6,27 @@ MODDIR="${0%/*}"
 key="aqmJau7K"
 
 Basic_Check() {
-       # 检查是否是 root 用户
-        if [ "$(whoami)" != "root" ]; then
-                echo "请使用 Root 权限运行此脚本"
-                exit 1
-       fi
+	# 检查是否是 root 用户
+	if [ "$(whoami)" != "root" ]; then
+		echo "请使用 Root 权限运行此脚本"
+		exit 1
+	fi
     
 	# 检查 boot 是否存在
 	if [ ! -f "boot.img" ]; then
-		echo "[!] 当前目录下未找到 boot.img"
-		echo "[x] 脚本已退出，请认真阅读 README.md"
-		exit 1
+		echo "[x] 当前目录下未找到 boot.img, 即将尝试提取"
+		echo "[!] 警告：本操作将提取系统分区镜像，存在一定风险！"
+		echo "[!] 请务必提前自行备份当前的 boot 镜像，避免设备变砖或数据丢失。"
+		echo -n "[?] 确认已备份并愿意继续操作？输入 y 继续，其他任意键退出: "
+		read -r confirm
+		if [ "$confirm" == "y" ]; then
+			echo "[✓] 开始提取 boot 镜像"
+			extract_boot
+		else
+			echo "[x] 在当前目录下未找到 boot.img"
+			echo "[x] 脚本已退出，请认真阅读 README.md"
+			exit 1
+		fi
 	fi
 
 	# 判断是否处于拥有可执行权限的目录下
@@ -55,6 +65,41 @@ Basic_Check() {
 		echo "[✓] 已清理完成，继续执行..."
 	fi
 }
+
+# 提取 Boot 镜像
+extract_boot() {
+	AB_check=$(getprop ro.build.ab_update)
+	Partition_location=$(getprop ro.boot.slot_suffix)
+
+	if [ "$AB_check" == "true" ]; then
+		echo "[✓] 你的手机是 AB 分区设备"
+
+		if [ "$Partition_location" == "_a" ]; then
+			echo "[-] 你目前处于 A 分区"
+			current="a"
+		elif [ "$Partition_location" == "_b" ]; then
+			echo "[-] 你目前处于 B 分区"
+			current="b"
+		else
+			echo "[x] 未知的分区后缀：$Partition_location，默认使用 _a"
+			current="a"
+		fi
+
+		echo "[-] 正在提取当前分区下的 Boot 镜像..."
+		dd if="/dev/block/bootdevice/by-name/boot_$current" of="${MODDIR}/boot.img" bs=4096 2>/dev/null
+	else
+		echo "[x] 你的手机不是 AB 分区设备，提取普通 boot 分区镜像"
+		dd if="/dev/block/bootdevice/by-name/boot" of="${MODDIR}/boot.img" bs=4096 2>/dev/null
+	fi
+
+	if [ -f "${MODDIR}/boot.img" ]; then
+		echo "[✓] 提取当前分区镜像成功"
+	else
+		echo "[x] 提取当前分区镜像失败"
+		return 1
+	fi
+}
+
 
 # 解包 boot
 boot_unpack() {
@@ -95,26 +140,26 @@ boot_repack() {
 
 main() {
 	Basic_Check
-	echo "---------------------------------"
+	echo "---------------------------"
 	echo "[?] 请输入序号选择修补是否带网络解冻的版本"
 	echo "[1] ReKernel (无网络解冻)"
 	echo "[2] ReKernel_network (带网络解冻)"
 	echo "[0] 退出"
-	echo -n "请输入序号："
+	echo -n "[?] 请输入序号："
 	read -r UserChose
 	if [ "$UserChose" -eq 1 ]; then
-		echo "你选择了 ReKernel (无网络解冻)"
-		echo "开始修补..."
+		echo "[-] 你选择了 ReKernel (无网络解冻)"
+		echo "[-] 开始修补..."
 		kpm="Re-Kernel"
 	elif [ "$UserChose" -eq 2 ]; then
-		echo "你选择了 ReKernel_network (带网络解冻)"
-		echo "开始修补..."
+		echo "[-] 你选择了 ReKernel_network (带网络解冻)"
+		echo "[-] 开始修补..."
 		kpm="Re-Kernel_network"
         elif [ "$UserChose" -eq 0 ]; then
-                echo "脚本已退出"
+                echo "[x] 脚本已退出"
 		exit 1
 	else
-		echo "错误的输入，脚本已退出"
+		echo "[x] 错误的输入，脚本已退出"
 		exit 1
 	fi
 	boot_unpack
