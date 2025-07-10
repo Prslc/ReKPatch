@@ -32,6 +32,22 @@ Basic_Check() {
 		echo "[✓] 当前处于拥有可执行权限目录下，继续执行..."
 	fi
 
+	if test -x "$MODDIR/kpm/kptools-android"; then
+		echo "[✓] kptools 可执行"
+	else
+		echo "[x] kptools 不可执行"
+		echo "[-] 正在尝试获取可执行权限..."
+		chmod +x "$MODDIR/kpm/kptools-android"
+		
+		if test -x "$MODDIR/kpm/kptools-android"; then
+			echo "[✓] kptools 已获得可执行权限，继续工作"
+		else
+			echo "[x] kptools 获取可执行权限失败，脚本已退出"
+			exit 1
+		fi
+	fi
+
+
 	if [[ -e "kernel" && -e "new-boot.img" ]]; then
 		echo "[?] 当前目录不干净，可能会影响嵌入效果"
 		echo "[-] 正在清理目录，以保证嵌入不会失败"
