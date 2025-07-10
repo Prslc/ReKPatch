@@ -6,6 +6,12 @@ MODDIR="${0%/*}"
 key="aqmJau7K"
 
 Basic_Check() {
+       # 检查是否是 root 用户
+        if [ "$(whoami)" != "root" ]; then
+                echo "请使用 Root 权限运行此脚本"
+                exit 1
+       fi
+    
 	# 检查 boot 是否存在
 	if [ ! -f "boot.img" ]; then
 		echo "[!] 当前目录下未找到 boot.img"
@@ -32,28 +38,6 @@ Basic_Check() {
 		sh clean.sh
 		echo "[✓] 已清理完成，继续执行..."
 	fi
-}
-
-# 音量键检测
-key_check() {
-	while true; do
-		key_check=$(/system/bin/getevent -qlc 1)
-		key_event=$(echo "$key_check" | awk '{ print $3 }' | grep 'KEY_')
-		key_status=$(echo "$key_check" | awk '{ print $4 }')
-		if [[ "$key_event" == *"KEY_"* && "$key_status" == "DOWN" ]]; then
-			keycheck="$key_event"
-			break
-		fi
-	done
-	while true; do
-		key_check=$(/system/bin/getevent -qlc 1)
-		key_event=$(echo "$key_check" | awk '{ print $3 }' | grep 'KEY_')
-		key_status=$(echo "$key_check" | awk '{ print $4 }')
-		if [[ "$key_event" == *"KEY_"* && "$key_status" == "UP" ]]; then
-			break
-		fi
-	done
-	echo "$keycheck"
 }
 
 # 解包 boot
@@ -95,21 +79,26 @@ boot_repack() {
 
 main() {
 	Basic_Check
-	echo "[=] 请按音量键选择修补是否带网络解冻的版本"
-	echo "[?] 如果你不知道你使用的墓碑是否拥有网络解冻功能，请阅读你使用的墓碑文档"
-	echo "[+] 音量 +，ReKernel (无网络解冻)"
-	echo "[-] 音量 -，ReKernel_network (带网络解冻)"
-	key_event=$(key_check)
-	if [ "$key_event" == "KEY_VOLUMEUP" ]; then
-		echo "你按了音量上键，开始修补 Re-kernel"
+	echo "---------------------------------"
+	echo "[?] 请输入序号选择修补是否带网络解冻的版本"
+	echo "[1] ReKernel (无网络解冻)"
+	echo "[2] ReKernel_network (带网络解冻)"
+	echo "[0] 退出"
+	echo -n "请输入序号："
+	read -r UserChose
+	if [ "$UserChose" -eq 1 ]; then
+		echo "你选择了 ReKernel (无网络解冻)"
+		echo "开始修补..."
 		kpm="Re-Kernel"
-	elif [ "$key_event" == "KEY_VOLUMEDOWN" ]; then
-		echo "你按了音量下键，开始修补 Re-kernel(network)"
+	elif [ "$UserChose" -eq 2 ]; then
+		echo "你选择了 ReKernel_network (带网络解冻)"
+		echo "开始修补..."
 		kpm="Re-Kernel_network"
+        elif [ "$UserChose" -eq 0 ]; then
+                echo "脚本已退出"
+		exit 1
 	else
-		echo "未检测到你按的音量键，脚本退出"
-		echo "如果你认为这是一个问题请提交 issue"
-		echo "key_event = $key_event"
+		echo "错误的输入，脚本已退出"
 		exit 1
 	fi
 	boot_unpack

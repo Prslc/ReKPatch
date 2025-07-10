@@ -18,23 +18,17 @@ jobs:
           mkdir kpm
           cd kpm 
           echo "Fetching latest release for KernelPatch..."
-          KernelPatch_LATEST_TAG=$(gh release list -R bmax121/KernelPatch --limit 1 | awk '{print $1}')
-          echo "KernelPatch_LATEST_TAG: $KernelPatch_LATEST_TAG"
-          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/KernelPatch --pattern "kpimg-linux"
-          gh release download "$KernelPatch_LATEST_TAG" -R bmax121/kernelPatch --pattern "kptools-android"
+          gh release download -R bmax121/KernelPatch --pattern "kpimg-linux"
+          gh release download -R bmax121/kernelPatch --pattern "kptools-android"
 
           echo "Fetching latest release for APatch_kpm..."
-          KPM_LATEST_TAG=$(gh release list -R lzghzr/APatch_kpm --limit 1 | awk '{print $1}')
-          echo "KPM_LATEST_TAG: $KPM_LATEST_TAG"
-          gh release download "$KPM_LATEST_TAG" -R lzghzr/APatch_kpm --pattern "re_kernel*.kpm"
+          gh release download -R lzghzr/APatch_kpm --pattern "re_kernel*.kpm"
           mv re_kernel_*_network.kpm Re-Kernel_network.kpm
           find . -type f -name "re_kernel_*.kpm" -exec mv {} Re-Kernel.kpm \;
           
           cd ../
           echo "Fetching latest release for Magisk..."
-          MAGISK_LATEST_TAG="v28.1"  # Adjusted to the correct version
-          echo "MAGISK_LATEST_TAG: $MAGISK_LATEST_TAG"
-          gh release download "$MAGISK_LATEST_TAG" -R topjohnwu/Magisk --pattern "Magisk-*.apk"
+          gh release download -R topjohnwu/Magisk --pattern "Magisk-*.apk"
 
           echo "Unpacking Magisk APK..."
           mkdir magisk_unpack
@@ -42,13 +36,12 @@ jobs:
           cp magisk_unpack/lib/arm64-v8a/libmagiskboot.so .
           rm -rf Magisk-*.apk magisk_unpack
 
-
-
-
       - name: Repack ReKPatch
         run: |
           mkdir ReKPatch
-          find . -maxdepth 1 ! -name "ReKPatch" -exec mv {} ReKPatch \;
+          for f in * .[^.]*; do
+            [ "$f" != "ReKPatch" ] && mv "$f" ReKPatch/
+          done
 
       - name: Upload zip
         uses: actions/upload-artifact@v4
