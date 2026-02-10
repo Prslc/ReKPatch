@@ -142,17 +142,21 @@ main() {
 	Basic_Check
 	echo "---------------------------"
 	echo "[?] 请输入序号选择修补是否带网络解冻的版本"
-	echo "[1] ReKernel (无网络解冻)"
-	echo "[2] ReKernel_network (带网络解冻)"
+	echo "[1] ReKernel"
+	echo "[2] ReKernel_network (网络解冻)"
 	echo "[0] 退出"
 	echo -n "[?] 请输入序号："
 	read -r UserChose
 
 	case "$UserChose" in
 	1)
+		echo "[-] 你选择了 ReKernel"
+		echo "[-] 开始修补..."
 		kpm="Re-Kernel"
 		;;
 	2)
+		echo "[-] 你选择了 ReKernel_network (网络解冻)"
+		echo "[-] 开始修补..."
 		kpm="Re-Kernel_network"
 		;;
 	0)
