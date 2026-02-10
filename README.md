@@ -2,7 +2,7 @@
 
 ## 项目介绍
 
-本项目使用 Magiskboot 解包 boot.img 获取 Kernel，并通过 kptools 修补 KPM 为 Kernel 增加 ReKernel KPM 功能。
+本项目通过 kptools 解包 boot.img 获取 Kernel，并对 Kernel 进行 KPM 修补，以支持 ReKernel KPM 功能。
 
 ## 🔧 修补说明
 
@@ -71,9 +71,8 @@ dmesg | grep Re:Kernel
 
 **如果上述三种方法都未能确认 ReKernel 的存在，说明该设备无法使用该方法获得 ReKernel。可能原因是内核拦截或魔改过于严重。已知 vivo 设备无法通过该方法获得 ReKernel，后续可能会出现更多类似的设备。**
 
-## ❤️ 感谢以下项目
+## ❤️ 致谢
 
--  [Magisk](https://github.com/topjohnwu/Magisk)
 -  [KernelPatch](https://github.com/bmax121/KernelPatch)
 -  [Re-Kernel](https://github.com/Sakion-Team/Re-Kernel)
 -  [Apatch](https://github.com/bmax121/APatch)
