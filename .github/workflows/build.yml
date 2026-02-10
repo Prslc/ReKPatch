@@ -25,16 +25,6 @@ jobs:
           gh release download -R lzghzr/APatch_kpm --pattern "re_kernel*.kpm"
           mv re_kernel_*_network.kpm Re-Kernel_network.kpm
           find . -type f -name "re_kernel_*.kpm" -exec mv {} Re-Kernel.kpm \;
-          
-          cd ../
-          echo "Fetching latest release for Magisk..."
-          gh release download -R topjohnwu/Magisk --pattern "Magisk-*.apk"
-
-          echo "Unpacking Magisk APK..."
-          mkdir magisk_unpack
-          unzip Magisk-*.apk -d magisk_unpack
-          cp magisk_unpack/lib/arm64-v8a/libmagiskboot.so .
-          rm -rf Magisk-*.apk magisk_unpack
 
       - name: Repack ReKPatch
         run: |

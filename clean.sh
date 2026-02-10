@@ -1,8 +1,8 @@
 MODDIR="${0%/*}"
 
 # 判断并删除当前目录下的文件
-[ -e "kernel" ] && ${MODDIR}/libmagiskboot.so --cleanup 2>/dev/null
-[ -e "new-boot.img" ] && rm "new-boot.img"
+[ -e "kernel" ] && rm "$MODDIR/kernel"
+[ -e "new-boot.img" ] && rm "$MODDIR/new-boot.img"
 
 # 判断并删除 kpm 目录下的文件
 [ -e "$MODDIR/kpm/patched_kernel" ] && rm "$MODDIR/kpm/patched_kernel"
