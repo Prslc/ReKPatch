@@ -1,4 +1,4 @@
-#!system//bin/sh
+#!system/bin/sh
 
 MODDIR="${0%/*}"
 
@@ -7,7 +7,7 @@ key="aqmJau7K"
 
 Basic_Check() {
 	# 检查是否是 root 用户
-	if [ "$(whoami)" != "root" ]; then
+	if [ "$(id -u)" != "0" ]; then
 		echo "请使用 Root 权限运行此脚本"
 		exit 1
 	fi
@@ -19,7 +19,7 @@ Basic_Check() {
 		echo "[!] 请务必提前自行备份当前的 boot 镜像，避免设备变砖或数据丢失。"
 		echo -n "[?] 确认已备份并愿意继续操作？输入 y 继续，其他任意键退出: "
 		read -r confirm
-		if [ "$confirm" == "y" ]; then
+		if [ "$confirm" = "y" ]; then
 			echo "[✓] 开始提取 boot 镜像"
 			extract_boot
 		else
@@ -58,7 +58,7 @@ Basic_Check() {
 	fi
 
 
-	if [[ -e "kernel" && -e "new-boot.img" ]]; then
+	if [ -e "kernel" ] && [ -e "new-boot.img" ]; then
 		echo "[?] 当前目录不干净，可能会影响嵌入效果"
 		echo "[-] 正在清理目录，以保证嵌入不会失败"
 		sh clean.sh
@@ -71,13 +71,13 @@ extract_boot() {
 	AB_check=$(getprop ro.build.ab_update)
 	Partition_location=$(getprop ro.boot.slot_suffix)
 
-	if [ "$AB_check" == "true" ]; then
-		echo "[✓] 你的手机是 AB 分区设备"
+	if [ "$AB_check" = "true" ]; then
+		echo "[✓] 你的设备是 AB 分区设备"
 
-		if [ "$Partition_location" == "_a" ]; then
+		if [ "$Partition_location" = "_a" ]; then
 			echo "[-] 你目前处于 A 分区"
 			current="a"
-		elif [ "$Partition_location" == "_b" ]; then
+		elif [ "$Partition_location" = "_b" ]; then
 			echo "[-] 你目前处于 B 分区"
 			current="b"
 		else
@@ -104,7 +104,7 @@ extract_boot() {
 # 解包 boot
 boot_unpack() {
 	echo "[-] 正在解包 boot 获取 kernel"
-	"$MODDIR/KPM/kptools" unpack boot.img >/dev/null 2>&1
+	"$MODDIR/kpm/kptools-android" unpack boot.img >/dev/null 2>&1
 	[ -e "kernel" ] && echo "[✓] 已成功获取 kernel"
 	cp kernel kpm/
 	cd kpm
@@ -132,7 +132,7 @@ Kernel_patching() {
 
 boot_repack() {
 	echo "[-] 正在打包 boot"
-	"$MODDIR/KPM/kptools" repack boot.img >/dev/null 2>&1
+	"$MODDIR/kpm/kptools-android" repack boot.img >/dev/null 2>&1
 	[ -e "new-boot.img" ] && echo "[✓] boot 已打包成功"
 	echo "[✓] 脚本已执行完毕，请确认当前目录下是否存在 new-boot.img"
 	echo "[✓] 最后刷入 new-boot.img，即可获得 Rekernel"
@@ -147,21 +147,24 @@ main() {
 	echo "[0] 退出"
 	echo -n "[?] 请输入序号："
 	read -r UserChose
-	if [ "$UserChose" -eq 1 ]; then
-		echo "[-] 你选择了 ReKernel (无网络解冻)"
-		echo "[-] 开始修补..."
+
+	case "$UserChose" in
+	1)
 		kpm="Re-Kernel"
-	elif [ "$UserChose" -eq 2 ]; then
-		echo "[-] 你选择了 ReKernel_network (带网络解冻)"
-		echo "[-] 开始修补..."
+		;;
+	2)
 		kpm="Re-Kernel_network"
-        elif [ "$UserChose" -eq 0 ]; then
-                echo "[x] 脚本已退出"
-		exit 1
-	else
+		;;
+	0)
+		echo "[x] 脚本已退出"
+		exit 0
+		;;
+	*)
 		echo "[x] 错误的输入，脚本已退出"
 		exit 1
-	fi
+		;;
+	esac
+
 	boot_unpack
 	Kernel_patching $kpm
 	boot_repack
