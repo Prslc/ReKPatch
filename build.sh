@@ -1,9 +1,7 @@
-#!system/bin/sh
+#!/system/bin/sh
+set -e
 
 MODDIR="${0%/*}"
-
-# 自定义密钥
-key="aqmJau7K"
 
 Basic_Check() {
 	# 检查是否是 root 用户
@@ -29,12 +27,16 @@ Basic_Check() {
 		fi
 	fi
 
-	# 判断是否处于拥有可执行权限的目录下
-	if echo "$MODDIR" | grep -qE "sdcard|storage/emulated"; then
-		echo "[!] 请勿在 sdcard 以及它的子目录下执行该脚本"
-		echo "[x] 脚本已退出，请认真阅读 README.md"
-		exit 1
-	elif [ ! -x . ]; then
+	# 判断是否处于 sdcard 或 emulated
+	case "$MODDIR" in
+		*sdcard*|*storage/emulated*)
+			echo "[!] 请勿在 sdcard 或其子目录执行"
+			exit 1
+			;;
+	esac
+
+	# 判断当前目录是否有可执行权限
+	if [ ! -x . ]; then
 		echo "[x] 当前目录没有可执行权限，请使用其他目录"
 		echo "[x] 脚本已退出，请认真阅读 README.md"
 		exit 1
@@ -58,12 +60,44 @@ Basic_Check() {
 	fi
 
 
-	if [ -e "kernel" ] && [ -e "new-boot.img" ]; then
+	if [ -e "kernel" ] || [ -e "new-boot.img" ]; then
 		echo "[?] 当前目录不干净，可能会影响嵌入效果"
 		echo "[-] 正在清理目录，以保证嵌入不会失败"
 		sh clean.sh
 		echo "[✓] 已清理完成，继续执行..."
 	fi
+}
+
+# https://github.com/bmax121/APatch/blob/main/app/src/main/java/me/bmax/apatch/ui/viewmodel/PatchesViewModel.kt#L191-L193
+check_pass() {
+    pass="$1"
+
+    # 长度 8~63
+    [ ${#pass} -lt 8 ] && return 1
+    [ ${#pass} -gt 63 ] && return 1
+
+    # 必须包含字母
+    echo "$pass" | grep -q '[A-Za-z]' || return 1
+
+    # 必须包含数字
+    echo "$pass" | grep -q '[0-9]' || return 1
+
+    return 0
+}
+
+input_superkey() {
+    echo "[!] 1.0 之后版本需手动输入超级密钥"
+
+    while true; do
+		echo -n "[?] 请输入超级密钥密码："
+		read SuperKey
+        if check_pass "$SuperKey"; then
+            echo "[✓] 密码格式正确"
+            return 0
+        else
+            echo "[x] 密码必须 8~63 位且包含字母和数字"
+        fi
+    done
 }
 
 # 提取 Boot 镜像
@@ -113,13 +147,13 @@ boot_unpack() {
 # 修补 Kernel
 Kernel_patching() {
 	echo "[-] 正在对 kernel 执行修补"
-	./kptools-android -p -i kernel -k kpimg-linux -M $1.kpm -V pre-kernel-init -T kpm -s $key -o patched_kernel
+	./kptools-android -p -i kernel -k kpimg-linux -M "$1.kpm" -V pre-kernel-init -T kpm -s "$SuperKey" -o patched_kernel
 	is_rekernel=$(./kptools-android -l -i patched_kernel)
 	[ -e "patched_kernel" ] && echo "[✓] Kernel 修补已完成"
 	if echo "$is_rekernel" | grep -qE "re_kernel"; then
-		echo "[✓] $kpm 已成功修补进你的内核！"
+		echo "[✓] "$1" 已成功修补进你的内核！"
 	else
-		echo "[x] $kpm 修补失败，脚本已退出"
+		echo "[x] "$1" 修补失败，脚本已退出"
 		cd ..
 		sh clean.sh
 		echo "[x] 已清理修补产生的文件，尝试重新修补"
@@ -169,9 +203,12 @@ main() {
 		;;
 	esac
 
+	input_superkey
 	boot_unpack
-	Kernel_patching $kpm
+	Kernel_patching "$kpm"
 	boot_repack
+
+	unset SuperKey	# 清理变量防止 Dump
 	exit 0
 }
 

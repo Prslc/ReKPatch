@@ -1,3 +1,6 @@
+#!/system/bin/sh
+set -e
+
 MODDIR="${0%/*}"
 
 # 判断并删除当前目录下的文件
