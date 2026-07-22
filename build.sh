@@ -68,38 +68,6 @@ Basic_Check() {
 	fi
 }
 
-# https://github.com/bmax121/APatch/blob/main/app/src/main/java/me/bmax/apatch/ui/viewmodel/PatchesViewModel.kt#L191-L193
-check_pass() {
-    pass="$1"
-
-    # 长度 8~63
-    [ ${#pass} -lt 8 ] && return 1
-    [ ${#pass} -gt 63 ] && return 1
-
-    # 必须包含字母
-    echo "$pass" | grep -q '[A-Za-z]' || return 1
-
-    # 必须包含数字
-    echo "$pass" | grep -q '[0-9]' || return 1
-
-    return 0
-}
-
-input_superkey() {
-    echo "[!] 1.0 之后版本需手动输入超级密钥"
-
-    while true; do
-		echo -n "[?] 请输入超级密钥密码："
-		read SuperKey
-        if check_pass "$SuperKey"; then
-            echo "[✓] 密码格式正确"
-            return 0
-        else
-            echo "[x] 密码必须 8~63 位且包含字母和数字"
-        fi
-    done
-}
-
 # 提取 Boot 镜像
 extract_boot() {
 	AB_check=$(getprop ro.build.ab_update)
@@ -147,7 +115,7 @@ boot_unpack() {
 # 修补 Kernel
 Kernel_patching() {
 	echo "[-] 正在对 kernel 执行修补"
-	./kptools-android -p -i kernel -k kpimg-linux -M "$1.kpm" -V pre-kernel-init -T kpm -s "$SuperKey" -o patched_kernel
+	./kptools-android -p -i kernel -k kpimg-linux -M "$1.kpm" -V pre-kernel-init -T kpm -o patched_kernel
 	is_rekernel=$(./kptools-android -l -i patched_kernel)
 	[ -e "patched_kernel" ] && echo "[✓] Kernel 修补已完成"
 	if echo "$is_rekernel" | grep -qE "re_kernel"; then
@@ -203,12 +171,10 @@ main() {
 		;;
 	esac
 
-	input_superkey
 	boot_unpack
 	Kernel_patching "$kpm"
 	boot_repack
 
-	unset SuperKey	# 清理变量防止 Dump
 	exit 0
 }
 
